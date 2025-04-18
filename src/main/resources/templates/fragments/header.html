@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head> </head>
+
+<body>
+  <header th:fragment="signedIn">
+    <nav class="navbar navbar-expand-lg navbar-light border-dark p-0 shadow px-2">
+      <div class="d-flex justify-content-between align-items-center h-100 w-100">
+        <div class="d-flex justify-content-between align-items-center h-100" style="width: 60%;">
+          <a class="navbar-brand m-0 p-0 h-100 hover-no-bg" th:href="@{/}">
+            <div class="d-flex flex-row justify-content-center align-items-center h-100">
+              <img th:src="@{~/images/logo/logo.png}" class="logo" alt="LMS Logo" title="LMS Home" />
+              <div class="ml-2 d-flex flex-column justify-content-center align-items-start">
+                <h4 class="mb-0">LMS</h4>
+              </div>
+            </div>
+          </a>
+          <div th:replace="this :: navbarQuickSearch"></div>
+        </div>
+        <div class="d-flex flex-row justify-content-between align-items-center h-100">
+          <div
+            class="d-none d-xl-flex flex-row justify-content-between align-items-center nav-a-tag-list h-100 text-center">
+            <a th:href="@{/member/dashboard}" class="navbar-a navbar-hover px-3 py-2 mx-1">Dashboard</a>
+            <a th:href="@{/member/dashboard#current-loans}" class="navbar-a navbar-hover px-3 py-2 mx-1">Current
+              Loans</a>
+            <a th:href="@{/member/dashboard#reservations}" class="navbar-a navbar-hover px-3 py-2 mx-1">Reservations</a>
+            <a th:href="@{/member/historical}" class="navbar-a navbar-hover px-3 py-2 mx-1">Historical Loans</a>
+          </div>
+          <div class="d-flex flex-row justify-content-center align-items-center h-100 dropdown mx-3 px-2">
+            <a th:href="@{/member/profile/view}"
+              class="d-flex justify-content-center align-items-center navbar-user-avatar-container hover">
+              <span class="font-weight-bold" th:text="${memberInitials}"></span>
+              <!-- <span class="font-weight-bold" id="memberAvatarInitials" th:text="${member.getInitials()}"></span> -->
+            </a>
+            <!-- <img th:src="@{~/images/profile/user64px.png}" class="profile-img hover" /> -->
+            <div class="dropdown-content profile-dropdown-content">
+              <a th:href="@{/member/profile/view}" class="px-4 py-2 dropdown-hover">
+                <div class="d-flex flex-row justify-content-start align-items-center dropdown-profile-img hover-no-bg">
+                  <div class="d-flex justify-content-center align-items-center navbar-user-avatar-container">
+                    <span class="font-weight-bold" th:text="${memberInitials}"></span>
+                  </div>
+                  <!-- <img th:src="@{~/images/profile/user64px.png}" class="profile-img" /> -->
+                  <div class="ml-2 d-flex flex-column justify-content-center align-items-start">
+                    <div class="text-capitalize" th:text="${member.fullName}"></div>
+                    <div th:text="${member.email}"></div>
+                  </div>
+                </div>
+              </a>
+              <a th:href="@{/member/dashboard}" class="px-4 py-2 dropdown-hover">Dashboard</a>
+              <a th:href="@{/member/dashboard#current-loans}" class="px-4 py-2 dropdown-hover">Current Loans</a>
+              <a th:href="@{/member/dashboard#reservations}" class="px-4 py-2 dropdown-hover">Reservations</a>
+              <a th:href="@{/member/historical}" class="px-4 py-2 dropdown-hover">Historical Loans</a>
+              <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/dashboard}"
+                class="px-4 py-2 dropdown-hover">Admin Site</a>
+              <div class="mx-3 divider"></div>
+              <a th:href="@{/logout}" class="px-4 py-2 dropdown-hover">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <header th:fragment="notSignedIn">
+    <nav class="navbar navbar-expand-lg navbar-light border-dark p-0 shadow px-2">
+      <div class="d-flex justify-content-between align-items-center h-100 w-100">
+        <div class="d-flex justify-content-between align-items-center h-100" style="width: 60%;">
+          <a class="navbar-brand m-0 p-0 h-100 hover-no-bg" th:href="@{/}">
+            <div class="d-flex flex-row justify-content-center align-items-center h-100">
+              <img th:src="@{~/images/logo/logo.png}" class="logo" alt="LMS Logo" title="LMS Home" />
+              <div class="ml-2 d-flex flex-column justify-content-center align-items-start">
+                <h4 class="mb-0">LMS</h4>
+              </div>
+            </div>
+          </a>
+          <div th:replace="this :: navbarQuickSearch"></div>
+        </div>
+        <div class="d-flex flex-row justify-content-between align-items-center h-100">
+          <div class="d-flex flex-row justify-content-center align-items-center h-100 dropdown">
+            <div class="navbar-a navbar-hover px-3 px-lg-5 py-2">
+              Log In
+            </div>
+            <div class="dropdown-content logIn-dropdown-content" id="logInDropdown">
+              <form action="/login" th:action="@{/login}" method="POST" th:id="logInForm">
+                <div class="px-4 py-3 text-center font-weight-bold">
+                  Log In and Start Reserving!
+                </div>
+                <div class="mx-3 divider"></div>
+                <div class="px-4 py-2">
+                  <div class="form__group">
+                    <input type="email" name="email" id="logInEmail" placeholder="john.doe@mail.com"
+                      th:value="${previousEmail}" required />
+                    <label for="logInEmail">Email</label>
+                  </div>
+                </div>
+                <div class="px-4 py-2">
+                  <div class="form__group">
+                    <input type="password" name="password" id="logInPassword" placeholder="&nbsp;" required />
+                    <label for="logInPassword">Password</label>
+                  </div>
+                </div>
+                <div class="px-4 py-3 text-right">
+                  <button type="submit" class="px-4 py-2 btn border border-dark text-dark hover">
+                    Log In
+                  </button>
+                </div>
+                <!-- <div class="mx-3 mt-1 divider"></div>
+                <div class="px-4 py-2 dropdown-hover text-center" style="font-size: 0.9rem;"
+                  onclick="logInFromSignUp()">
+                  Don't have an account? Sign Up
+                </div> -->
+              </form>
+            </div>
+          </div>
+          <div class="d-flex flex-row justify-content-center align-items-center h-100 dropdown mr-1">
+            <div class="navbar-a navbar-hover px-3 px-lg-5 py-2">
+              Sign Up
+            </div>
+            <div class="dropdown-content signUp-dropdown-content" id="signUpDropdown">
+              <form action="/register" th:action="@{/register}" method="POST" th:id="signUpForm">
+                <div class="px-4 py-3 text-center font-weight-bold">
+                  Sign Up and Start Reading!
+                </div>
+                <div class="mx-3 divider"></div>
+                <div class="px-4 py-2">
+                  <div class="form__group">
+                    <input type="text" name="fullName" id="signUpFullName" placeholder="John Doe"
+                      th:value="${previousFullName}" required />
+                    <label for="signUpFullName">Full Name</label>
+                  </div>
+                </div>
+                <div class="px-4 py-2">
+                  <div class="form__group">
+                    <input type="email" name="email" id="signUpEmail" placeholder="john.doe@mail.com"
+                      th:value="${previousEmail}" required />
+                    <label for="signUpEmail">Email</label>
+                  </div>
+                </div>
+                <div class="px-4 py-2">
+                  <div class="form__group">
+                    <input type="password" name="password" minlength="8" id="signUpPassword" placeholder="&nbsp;"
+                      required />
+                    <label for="signUpPassword">Password</label>
+                  </div>
+                </div>
+                <div class="px-4 py-2">
+                  <div class="form__group">
+                    <input type="password" name="confirmPassword" minlength="8" id="signUpConfirmPassword"
+                      placeholder="&nbsp;" required />
+                    <label for="signUpConfirmPassword">Confirm Password</label>
+                  </div>
+                </div>
+                <div class="px-4 py-3 text-right">
+                  <button type="submit" class="px-4 py-2 btn border border-dark text-dark hover">
+                    Sign Up
+                  </button>
+                </div>
+                <!-- <div class="mx-3 mt-1 divider"></div>
+                <a href="#" class="px-4 py-2 dropdown-hover text-center" style="font-size: 0.9rem;"
+                  onclick="signUpFromLogIn()">
+                  Already have an account? Log In
+                </a> -->
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <!-- Include JavaScript from static folder -->
+    <script type="text/javascript" src="/js/navbarAuthentication.js"></script>
+  </header>
+
+  <div th:fragment="navbarQuickSearch" class="d-none d-lg-block" style="width: 52.5%;">
+    <div class="quick-search-container quick-search-dropdown">
+      <input type="text" autocomplete="off" placeholder="Search artifact"
+        class="form-control border border-dark rounded-0 text-dark" id="navbarSearchQuery" name="navbarSearchQuery"
+        oninput="navbarSearchForm('/artifacts/search?searchQuery=')" />
+      <label for="navbarSearchQuery">
+        <img th:src="@{~/images/search.png}" class="search-glass hover-no-bg" id="navbarGlass" alt="Search icon"
+          title="Search" />
+      </label>
+      <div class="search-spinner" id="navbarSpinner">
+        <div class="sk-chase">
+          <div class="sk-chase-dot"></div>
+          <div class="sk-chase-dot"></div>
+          <div class="sk-chase-dot"></div>
+          <div class="sk-chase-dot"></div>
+          <div class="sk-chase-dot"></div>
+          <div class="sk-chase-dot"></div>
+        </div>
+      </div>
+      <div class="quick-search-dropdown-content" id="cardsContainer"></div>
+    </div>
+
+    <!-- Include JavaScript from static folder -->
+    <script type="text/javascript" src="/js/navbarSearch.js"></script>
+  </div>
+</body>
+
+</html>

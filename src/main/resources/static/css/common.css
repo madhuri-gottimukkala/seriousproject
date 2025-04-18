@@ -1,0 +1,90 @@
+@import "cards.css";
+@import "forms.css";
+@import "navbar.css";
+@import "navbarSearch.css";
+@import "tables.css";
+
+button,
+input[type="submit"],
+input[type="reset"] {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+a,
+u {
+  color: black;
+  text-decoration: none;
+  display: block;
+}
+
+.links a {
+  padding: 2px 6px;
+}
+
+.links a.active {
+  color: grey;
+}
+
+.links a.active:hover {
+  text-decoration: none;
+  cursor: text;
+}
+
+.no-underline {
+  text-decoration: none;
+}
+
+.logo {
+  height: 90%;
+  object-fit: contain;
+}
+
+.hover:hover {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.8;
+  cursor: pointer;
+  transition-duration: 0.2s;
+  background-color: #f3f3f3;
+}
+
+.hover-no-bg:hover {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.hover-only-bg:hover {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: #f3f3f3;
+}
+
+.w-45 {
+  width: 45% !important;
+}
+
+
+.divider {
+  height: 1px;
+  overflow: hidden;
+  background-color: rgba(222, 223, 224, 0.45);
+}
+
+
+
+.grow {
+  transition: all 0.1s ease-in-out;
+}
+
+.grow:hover {
+  transform: scale(1.05);
+}

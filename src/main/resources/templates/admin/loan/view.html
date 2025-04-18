@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+
+  <!-- Import CSS -->
+  <link rel="stylesheet" th:href="@{~/css/common.css}" />
+  <title>View Loans | LMS</title>
+</head>
+
+<body class="m-0">
+  <header th:replace="admin/fragments/header.html"></header>
+
+  <main>
+    <div class="w-100 w-lg-75 my-4 mx-auto container">
+      <div class="d-flex flex-row justify-content-between align-items-start">
+        <h3 class="mb-4">Loans</h3>
+        <a th:href="@{~/admin/loans/create}" class="d-flex flex-column justify-content-center align-items-center">
+          <img th:src="@{~/images/add_v1.png}" class="create-new-img" alt="Create new artifact icon"
+            title="Create new artifact" />
+        </a>
+      </div>
+      <div th:classappend="${#strings.isEmpty(previousIsSuccess)} ? mb-5 : mb-1">
+        <form action="#" th:action="@{/admin/loans/view}" method="GET" th:id="searchForm">
+          <div class="d-flex flex-column justify-content-between align-items-start">
+            <div class="d-flex flex-row justify-content-between align-items-end w-75 mb-4">
+              <div style="width: 45%;">
+                <label for="artifactQuery" class="mb-2 font-weight-bold">Artifact ID / Name / ISBN:</label>
+                <input type="text" class="form-control border border-dark rounded-0 text-dark" name="artifactQuery"
+                  id="artifactQuery" style="font-weight: 500;" placeholder="" th:value="${previousArtifact}" />
+              </div>
+              <div style="width: 45%;">
+                <label for="memberQuery" class="mb-2 font-weight-bold">Member ID / Name / Email:</label>
+                <input type="text" class="form-control border border-dark rounded-0 text-dark" name="memberQuery"
+                  id="memberQuery" style="font-weight: 500;" placeholder="John Doe" th:value="${previousMember}" />
+              </div>
+            </div>
+            <div class="d-flex flex-row justify-content-between align-items-end w-100">
+              <div class="d-flex flex-row justify-content-between align-items-start" style="width: 60%;">
+                <div style="width: 35%;">
+                  <label for="fromDate" class="mb-2 font-weight-bold">From Date:</label>
+                  <input type="text" class="form-control border border-dark rounded-0 text-dark" name="fromDate"
+                    id="fromDate" style="font-weight: 500;" placeholder="yyyy-mm-dd" th:value="${previousFromDate}" />
+                </div>
+                <div style="width: 35%;">
+                  <label for="toDate" class="mb-2 font-weight-bold">To Date:</label>
+                  <input type="text" class="form-control border border-dark rounded-0 text-dark" name="toDate"
+                    id="toDate" style="font-weight: 500;" placeholder="yyyy-mm-dd" th:value="${previousToDate}" />
+                </div>
+                <div style="width: 20%;">
+                  <label for="dateType" class="mb-2 font-weight-bold">Date Type:</label>
+                  <select id="dateType" name="dateType" class="form-control border border-dark rounded-0 text-dark">
+                    <option value="" th:selected="${#strings.isEmpty(previousType)}">All</option>
+                    <option value="issued date" th:selected="${previousType == 'issued date'}">Issued date</option>
+                    <option value="return date" th:selected="${previousType == 'return date'}">Return date</option>
+                  </select>
+                </div>
+              </div>
+              <div th:replace="admin/fragments/actionMessage.html :: hiddenInputsForActionMessages"></div>
+              <button type="submit" class="px-4 py-2 btn border border-dark text-dark hover">Search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div th:replace="admin/fragments/actionMessage.html :: showActionMessage"></div>
+      <div class="row no-gutters">
+        <div class="col-12">
+          <table class="w-100 divtable">
+            <!-- <col width="5%">
+            <col width="11%">
+            <col width="8%">
+            <col width="8%">
+            <col width="8%">
+            <col width="8%">
+            <col width="8%">
+            <col width="8%">
+            <col width="8%">
+            <col width="12%">
+            <col width="8%">
+            <col width="4%">
+            <col width="4%"> -->
+            <thead class="border-top border-dark">
+              <tr>
+                <th class="p-2">ID</th>
+                <th class="p-2">Artifact</th>
+                <th class="p-2">ISBN</th>
+                <th class="p-2">Issued To</th>
+                <th class="p-2">Issued Date</th>
+                <th class="p-2">Return Date</th>
+                <th class="p-2">Fine</th>
+                <th class="p-2">Status</th>
+                <th class="p-2"></th>
+                <th class="p-2"></th>
+                <th class="p-2"></th>
+                <th class="p-2"></th>
+                <th class="p-2"></th>
+              </tr>
+            </thead>
+            <tfoot th:replace="admin/fragments/pagination.html :: pagination"></tfoot>
+            <tbody class="border-bottom border-dark">
+              <tr th:each="loan : ${loans}" th:id="'tr-' + ${loan.id}">
+                <td class="p-2" th:text="${loan.id}"></td>
+                <td class="p-2 text-capitalize" th:text="${loan.artifact.title}"></td>
+                <td class="p-2">
+                  <a th:href="@{~/admin/artifacts/view(searchQuery=${loan.artifact.isbn})}" class="table-link" style="color: #21252B;" th:text="${loan.isbn}"></a>
+                </td>
+                <td class="p-2 text-capitalize">
+                  <a th:href="@{~/admin/members/view(searchQuery=${loan.member.email})}" class="table-link" style="color: #21252B;" th:text="${loan.member.fullName}"></a>
+                </td>
+                <td class="p-2" th:text="${loan.getIssuedOnForAdminView()}"></td>
+                <td class="p-2" th:text="${loan.getReturnOnForAdminView()}"></td>
+                <td class="p-2">&dollar;<span th:text="${loan.fine}"></span></td>
+                <td class="p-2 text-capitalize" th:text="${loan.status}" th:id="'status-' + ${loan.id}"></td>
+                <td class="p-2">
+                  <div th:unless="${loan.status == 'returned' OR loan.status == 'restocked'}">
+                    <form th:action="@{/admin/loans/return}" method="POST" th:id="'return-form-' + ${loan.id}">
+                      <div class="d-flex flex-row justify-content-center align-items-center">
+                        <button type="button" th:onclick="'returnForm(' + ${loan.id} + ')'" class="d-flex flex-row justify-content-center align-items-center table-link">
+                          <img th:src="@{~/images/return.png}" class="table-img" alt="Return artifact icon" title="Return artifact"/>
+                          <div>&nbsp;Return</div>
+                        </button>
+                        <input type="text" class="d-none" name="id" th:value="${loan.id}" />
+                      </div>
+                    </form>
+                  </div>
+                </td>
+                <td class="p-2">
+                  <div th:unless="${loan.status == 'returned' OR loan.status == 'restocked' OR loan.status == 'delayed'}">
+                    <form th:action="@{/admin/loans/renew}" method="POST" th:id="'renew-form-' + ${loan.id}">
+                      <div class="d-flex flex-row justify-content-center align-items-center">
+                        <button type="button" th:onclick="'renewForm(' + ${loan.id} + ')'" class="d-flex flex-row justify-content-center align-items-center table-link">
+                          <img th:src="@{~/images/reuse.png}" class="table-img" alt="Renew artifact icon" title="Renew artifact"/>
+                          <div>&nbsp;Renew&nbsp;</div>
+                        </button>
+                        <input type="text" class="form-control border border-dark rounded-0 text-dark text-center table-input" name="daysToRenew" th:placeholder="${daysToRenew}" th:value="${daysToRenew}" />
+                        <input type="text" class="d-none" name="id" th:value="${loan.id}" />
+                        &nbsp;days
+                      </div>
+                    </form>
+                  </div>
+                </td>
+                <td class="p-2">
+                  <div th:unless="${loan.status == 'returned' OR loan.status == 'restocked'}">
+                    <form th:action="@{/admin/loans/lost}" method="POST" th:id="'lost-form-' + ${loan.id}">
+                      <div class="d-flex flex-row justify-content-center align-items-center">
+                        <button type="button" th:onclick="'lostForm(' + ${loan.id} + ')'" class="d-flex flex-row justify-content-center align-items-center table-link">
+                          <img th:src="@{~/images/lost_item.png}" class="table-img" alt="Mark artifact as lost icon" title="Mark artifact as lost"/>
+                          <div>&nbsp;Lost</div>
+                        </button>
+                        <input type="text" class="d-none" name="id" th:value="${loan.id}" />
+                      </div>
+                    </form>
+                  </div>
+                </td>
+                <td class="p-2">
+                  <a th:href="@{~/admin/loans/edit(id=${loan.id})}"
+                    class="d-flex flex-row justify-content-center align-items-center table-link">
+                    <img th:src="@{~/images/edit_pencil.png}" class="table-img" alt="Edit artifact icon" title="Edit artifact"/>
+                  </a>
+                </td>
+                <td class="p-2">
+                  <form th:action="@{/admin/loans/delete}" method="POST" th:id="'delete-form-' + ${loan.id}">
+                    <div class="d-flex flex-row justify-content-center align-items-center">
+                      <button type="button" th:onclick="'deleteForm(' + ${loan.id} + ')'" class="d-flex flex-row justify-content-center align-items-center table-link">
+                        <img th:src="@{~/images/red_trash_can.png}" class="table-img" alt="Delete artifact icon" title="Delete artifact" />
+                      </button>
+                      <input type="text" class="d-none" name="id" th:value="${loan.id}" />
+                    </div>
+                  </form>
+                </td>
+              </tr>
+              <tr th:each="i: ${#numbers.sequence(1, totalEmptyRows, 1)}">
+                <td class="p-2">&nbsp;</td>
+                <td class="p-2"></td>
+                <td class="p-2"></td>
+                <td class="p-2"></td>
+                <td class="p-2"></td>
+                <td class="p-2"></td>
+                <td class="p-2"></td>
+                <td class="p-2"></td>
+                <td class="p-2"></td>
+                <td class="p-2"></td>
+                <td class="p-2"></td>
+                <td class="p-2"></td>
+                <td class="p-2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer></footer>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+  </script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+  <!-- Include JavaScript from static folder -->
+  <script type="text/javascript" src="/js/formTriggers.js"></script>
+</body>
+
+</html>
