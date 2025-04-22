@@ -10,35 +10,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
 
-      - name: Build with Maven
-        run: mvn clean package -DskipTests
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
 
-      - name: Copy JAR to EC2
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.AWS_HOST }}
-          username: ${{ secrets.AWS_USER }}
-          key: ${{ secrets.AWS_KEY }}
-          source: "target/*.jar"
-          target: "/home/${{ secrets.AWS_USER }}/app"
-          port: 22
+    - name: Copy JAR to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.AWS_HOST }}
+        username: ${{ secrets.AWS_USER }}
+        key: ${{ secrets.AWS_KEY }}
+        source: "target/*.jar"
+        target: "/home/${{ secrets.AWS_USER }}/app"
+        port: 22
+        timeout: 30s
+        command_timeout: 10m
+        debug: true
 
-      - name: SSH into EC2 and restart app
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.AWS_HOST }}
-          username: ${{ secrets.AWS_USER }}
-          key: ${{ secrets.AWS_KEY }}
-          script: |
-            pkill -f 'java' || true
-            cd /home/${{ secrets.AWS_USER }}/app
-            nohup java -jar *.jar > app.log 2>&1 &
+    - name: SSH into EC2 and prepare deployment
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.AWS_HOST }}
+        username: ${{ secrets.AWS_USER }}
+        key: ${{ secrets.AWS_KEY }}
+        script: |
+          # Create target directory if it doesn't exist
+          mkdir -p /home/${{ secrets.AWS_USER }}/app
+          
+          # Stop any existing Java applications
+          pkill -f 'java' || true
+          
+          # Move to app directory and start the new application
+          cd /home/${{ secrets.AWS_USER }}/app
+          nohup java -jar *.jar > app.log 2>&1 &
+
+    - name: Clean up old builds (Optional)
+      run: |
+        ssh -i ${{ secrets.AWS_KEY }} -o StrictHostKeyChecking=no ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "rm -rf /home/${{ secrets.AWS_USER }}/app/*"
