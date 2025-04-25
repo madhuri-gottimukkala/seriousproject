@@ -7,7 +7,7 @@
 		<version>2.2.4.RELEASE</version>
 		<relativePath />
 	</parent>
-	<groupId>ie.ucd</groupId>
+	<groupId>com.ucmo</groupId>
 	<artifactId>lms</artifactId>
 	<version>0.1</version>
 
